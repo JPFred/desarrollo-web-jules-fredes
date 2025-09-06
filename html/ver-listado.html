@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Listado de Avisos de Adopción</title>
+    <link rel="stylesheet" type="text/css" href="../css/index.css">
+    <link rel="stylesheet" type="text/css" href="../css/ver-list-sty.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="index.html" class="nav-button">← Volver</a>
+        Patitas a la Casa 🐾
+    </div>
+
+    <div class="listado-container">
+        <h2>Listado de Avisos de Adopción</h2>
+        
+        <button class="btn btn-volver" onclick="window.location.href='index.html'">
+            Volver a la portada
+        </button>
+        
+        <table class="tabla-listado" id="tabla-avisos">
+            <thead>
+                <tr>
+                    <th>Fecha Publicación</th>
+                    <th>Fecha Entrega</th>
+                    <th>Comuna</th>
+                    <th>Sector</th>
+                    <th>Cantidad tipo edad</th>
+                    <th>Nombre Contacto</th>
+                    <th>Total fotos</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-avisos">
+                <!-- Los avisos se cargarán dinámicamente aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para mostrar detalles del aviso -->
+    <div id="modal-detalle" class="modal hidden">
+        <div class="modal-content">
+            <h3>Detalles del Aviso de Adopción</h3>
+            <div id="contenido-detalle">
+                <!-- El contenido del detalle se cargará aquí -->
+            </div>
+            <div class="fotos-container" id="fotos-detalle">
+                <!-- Las fotos se cargarán aquí -->
+            </div>
+            <button class="btn" onclick="cerrarModal()">Cerrar</button>
+            <button class="btn btn-volver" onclick="window.location.href='index.html'">
+                Volver a la portada
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar foto grande -->
+    <div id="modal-foto" class="modal hidden">
+        <div class="modal-content">
+            <img id="foto-grande" class="foto-grande" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Foto grande">
+            <br><br>
+            <button class="btn" onclick="cerrarFoto()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo para demostrar el listado (inventados)
+        const avisosEjemplo = [
+            {
+                id: 1,
+                fechaPublicacion: "2025-08-18 12:00",
+                fechaEntrega: "2025-08-20 15:00",
+                comuna: "La Reina",
+                sector: "Tasmania 2419",
+                tipo: "gato",
+                cantidad: 1,
+                edad: 2,
+                unidadEdad: "años",
+                nombreContacto: "María González",
+                email: "maria@email.com",
+                celular: "+569.12345678",
+                descripcion: "Gata adulta muy regalona, busca familia amorosa.",
+                fotos: ["../resc/gati1.jpg", "../resc/gati2.jpg", "../resc/gati3.jpg"]
+            },
+            {
+                id: 2,
+                fechaPublicacion: "2025-08-17 19:00",
+                fechaEntrega: "2025-08-19 10:00",
+                comuna: "Ñuñoa",
+                sector: "Plaza Ñuñoa",
+                tipo: "gato",
+                cantidad: 3,
+                edad: 2,
+                unidadEdad: "meses",
+                nombreContacto: "Carlos Rodríguez",
+                email: "carlos@email.com",
+                celular: "+569.87654321",
+                descripcion: "Tres gatitos rescatados, muy juguetones.",
+                fotos: ["../resc/tresgatitos1.jpg", "../resc/tresgatitos2.jpg"]
+            },
+            {
+                id: 3,
+                fechaPublicacion: "2025-08-16 14:30",
+                fechaEntrega: "2025-08-18 16:00",
+                comuna: "Las Condes",
+                sector: "Kennedy",
+                tipo: "gato",
+                cantidad: 2,
+                edad: 1,
+                unidadEdad: "años",
+                nombreContacto: "Ana Silva",
+                email: "ana@email.com",
+                celular: "+569.11223344",
+                descripcion: "Dos gatos adultos, hermanos, muy tranquilos.",
+                fotos: ["../resc/dosgati1.jpg", "../resc/dosgati2.jpg", "../resc/dosgati3.jpg", "../resc/dosgati4.jpg"]
+            },
+            {
+                id: 4,
+                fechaPublicacion: "2025-08-15 09:15",
+                fechaEntrega: "2025-08-17 14:00",
+                comuna: "Providencia",
+                sector: "Metro Salvador",
+                tipo: "perro",
+                cantidad: 1,
+                edad: 6,
+                unidadEdad: "meses",
+                nombreContacto: "Luis Morales",
+                email: "luis@email.com",
+                celular: "+569.55667788",
+                descripcion: "Cachorro muy activo, le gusta jugar en el parque.",
+                fotos: ["../resc/perri1.jpg"]
+            },
+            {
+                id: 5,
+                fechaPublicacion: "2025-08-14 16:45",
+                fechaEntrega: "2025-08-16 11:00",
+                comuna: "La Florida",
+                sector: "Villa O'Higgins",
+                tipo: "perro",
+                cantidad: 1,
+                edad: 2,
+                unidadEdad: "meses",
+                nombreContacto: "Patricia López",
+                email: "patricia@email.com",
+                celular: "+569.99887766",
+                descripcion: "Cachorrito muy cariñoso, se recomienda que sea adoptado en un hogar con jardín.",
+                fotos: ["../resc/golden1.jpg", "../resc/golden2.jpg", "../resc/golden3.jpg", "../resc/golden4.jpg", "../resc/golden5.jpg"]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarListadoAvisos();
+        });
+
+        function cargarListadoAvisos() {
+            const tbody = document.getElementById('tbody-avisos');
+            tbody.innerHTML = '';
+
+            // Ordenar por fecha de publicación (más reciente primero)
+            const avisosOrdenados = avisosEjemplo.sort((a, b) => {
+                return new Date(b.fechaPublicacion) - new Date(a.fechaPublicacion);
+            });
+
+            avisosOrdenados.forEach(aviso => {
+                const fila = document.createElement('tr');
+                fila.onclick = () => mostrarDetalle(aviso);
+                
+                fila.innerHTML = `
+                    <td>${formatearFecha(aviso.fechaPublicacion)}</td>
+                    <td>${formatearFecha(aviso.fechaEntrega)}</td>
+                    <td>${aviso.comuna}</td>
+                    <td>${aviso.sector}</td>
+                    <td>${aviso.cantidad} ${aviso.tipo}${aviso.cantidad > 1 ? 's' : ''} ${aviso.edad} ${aviso.unidadEdad}</td>
+                    <td>${aviso.nombreContacto}</td>
+                    <td>${aviso.fotos.length}</td>
+                `;
+                
+                tbody.appendChild(fila);
+            });
+        }
+
+        function formatearFecha(fechaStr) {
+            const fecha = new Date(fechaStr);
+            return fecha.toLocaleDateString('es-CL') + ' ' + fecha.toLocaleTimeString('es-CL', {hour: '2-digit', minute: '2-digit'});
+        }
+
+        function mostrarDetalle(aviso) {
+            const contenidoDetalle = document.getElementById('contenido-detalle');
+            const fotosDetalle = document.getElementById('fotos-detalle');
+            
+            contenidoDetalle.innerHTML = `
+                <div class="info-detalle">
+                    <strong>Fecha de Publicación:</strong> ${formatearFecha(aviso.fechaPublicacion)}
+                </div>
+                <div class="info-detalle">
+                    <strong>Fecha de Entrega:</strong> ${formatearFecha(aviso.fechaEntrega)}
+                </div>
+                <div class="info-detalle">
+                    <strong>Ubicación:</strong> ${aviso.comuna}, ${aviso.sector}
+                </div>
+                <div class="info-detalle">
+                    <strong>Mascota:</strong> ${aviso.cantidad} ${aviso.tipo}${aviso.cantidad > 1 ? 's' : ''} de ${aviso.edad} ${aviso.unidadEdad}
+                </div>
+                <div class="info-detalle">
+                    <strong>Contacto:</strong> ${aviso.nombreContacto}
+                </div>
+                <div class="info-detalle">
+                    <strong>Email:</strong> ${aviso.email}
+                </div>
+                <div class="info-detalle">
+                    <strong>Celular:</strong> ${aviso.celular}
+                </div>
+                <div class="info-detalle">
+                    <strong>Descripción:</strong> ${aviso.descripcion}
+                </div>
+            `;
+            
+            fotosDetalle.innerHTML = '<h4>Fotos (haz clic para ampliar):</h4>';
+            aviso.fotos.forEach((foto, index) => {
+                const img = document.createElement('img');
+                img.src = foto;
+                img.alt = `Foto ${index + 1}`;
+                img.className = 'foto-detalle';
+                img.onclick = () => mostrarFotoGrande(foto);
+                fotosDetalle.appendChild(img);
+            });
+            
+            document.getElementById('modal-detalle').classList.remove('hidden');
+        }
+
+        function mostrarFotoGrande(urlFoto) {
+            document.getElementById('foto-grande').src = urlFoto;
+            document.getElementById('modal-foto').classList.remove('hidden');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-detalle').classList.add('hidden');
+        }
+
+        function cerrarFoto() {
+            document.getElementById('modal-foto').classList.add('hidden');
+            // Volver al placeholder transparente
+            document.getElementById('foto-grande').src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        }
+
+        // Cerrar modales al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            const modalDetalle = document.getElementById('modal-detalle');
+            const modalFoto = document.getElementById('modal-foto');
+            
+            if (event.target === modalDetalle) {
+                cerrarModal();
+            }
+            if (event.target === modalFoto) {
+                cerrarFoto();
+            }
+        }
+    </script>
+</body>
+</html>
