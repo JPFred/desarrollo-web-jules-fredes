@@ -1,4 +1,4 @@
-# Tarea 1: Sistema de Gestión de Avisos de Adopción de Mascotas
+# Tarea 2: Sistema de Gestión de Avisos de Adopción de Mascotas
 
 ## 👤 Autor
 

@@ -1,0 +1,206 @@
+body {
+  background-color: #e2e4f4;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.listado-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 30px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.listado-container h2 {
+  color: #d74967;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+
+.tabla-listado {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-listado th {
+  background-color: #d74967;
+  color: white;
+  padding: 18px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tabla-listado td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.tabla-listado tr:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.btn {
+  background-color: #f47066;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  margin: 5px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background-color: #d74967;
+}
+
+.btn-secondary {
+  background-color: #a7a6da;
+}
+
+.btn-secondary:hover {
+  background-color: #b384c0;
+}
+
+.btn-volver {
+  background-color: #efbe7b;
+  margin-bottom: 20px;
+}
+
+.btn-volver:hover {
+  background-color: #b384c0;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(167, 166, 218, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: linear-gradient(135deg, white 0%, rgba(226, 228, 244, 0.95) 100%);
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 15px 35px rgba(167, 166, 218, 0.5);
+  border: 2px solid rgba(167, 166, 218, 0.3);
+}
+
+.modal-content h3 {
+  color: #d74967;
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 24px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.foto-detalle {
+  width: 320px;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid rgba(167, 166, 218, 0.3);
+  box-shadow: 0 4px 15px rgba(167, 166, 218, 0.3);
+}
+
+.foto-detalle:hover {
+  transform: scale(1.05);
+  border-color: #a7a6da;
+  box-shadow: 0 8px 25px rgba(167, 166, 218, 0.5);
+}
+
+.foto-grande {
+  width: 800px;
+  height: 600px;
+  object-fit: cover;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(167, 166, 218, 0.5);
+}
+
+.fotos-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.fotos-container h4 {
+  color: #b384c0;
+  margin-bottom: 15px;
+}
+
+.info-detalle {
+  margin: 12px 0;
+  padding: 15px;
+  background: linear-gradient(
+    135deg,
+    rgba(226, 228, 244, 0.5) 0%,
+    rgba(167, 166, 218, 0.2) 100%
+  );
+  border-radius: 12px;
+  border-left: 4px solid #a7a6da;
+}
+
+.info-detalle strong {
+  color: #d74967;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .tabla-listado {
+    font-size: 12px;
+  }
+
+  .tabla-listado th,
+  .tabla-listado td {
+    padding: 10px 8px;
+  }
+
+  .foto-detalle {
+    width: 280px;
+    height: 200px;
+    margin: 5px;
+  }
+
+  .foto-grande {
+    width: 90vw;
+    height: auto;
+    max-width: 600px;
+  }
+
+  .listado-container {
+    margin: 10px;
+    padding: 20px;
+  }
+
+  .btn {
+    padding: 10px 15px;
+    font-size: 12px;
+  }
+}

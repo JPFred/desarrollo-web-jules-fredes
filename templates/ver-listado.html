@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Listado de Avisos de Adopción</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/ver-list-sty.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="{{ url_for('index') }}" class="nav-button">← Volver</a>
+        Patitas a la Casa 🐾
+    </div>
+
+    <div class="listado-container">
+        <h2>Listado de Avisos de Adopción</h2>
+        
+        <button class="btn btn-volver" onclick="window.location.href='{{ url_for('index') }}'">
+            Volver a la portada
+        </button>
+        
+        <table class="tabla-listado" id="tabla-avisos">
+            <thead>
+                <tr>
+                    <th>Fecha Publicación</th>
+                    <th>Fecha Entrega</th>
+                    <th>Comuna</th>
+                    <th>Sector</th>
+                    <th>Cantidad tipo edad</th>
+                    <th>Nombre Contacto</th>
+                    <th>Total fotos</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-avisos">
+                {% if avisos %}
+                    {% for aviso in avisos %}
+                    <tr onclick="verDetalle({{ aviso.id }})" style="cursor: pointer;">
+                        <td>{{ aviso.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ aviso.fecha_entrega.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ aviso.comuna.nombre }}</td>
+                        <td>{{ aviso.sector if aviso.sector else '-' }}</td>
+                        <td>{{ aviso.cantidad }} {{ aviso.tipo }}{% if aviso.cantidad > 1 %}s{% endif %}, {{ aviso.edad }} {% if aviso.unidad_medida == 'a' %}año{% if aviso.edad > 1 %}s{% endif %}{% else %}mes{% if aviso.edad > 1 %}es{% endif %}{% endif %}</td>
+                        <td>{{ aviso.nombre }}</td>
+                        <td>{{ aviso.fotos|length }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 30px; color: #666;">
+                            No hay avisos de adopción disponibles
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <!-- Paginación -->
+        {% if pagination and pagination.pages > 1 %}
+        <div class="paginacion" style="text-align: center; margin: 30px 0; display: flex; justify-content: center; align-items: center; gap: 20px;">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('ver_listado', page=pagination.prev_num) }}" class="btn" style="text-decoration: none;">← Anterior</a>
+            {% else %}
+            <button class="btn" disabled style="opacity: 0.5; cursor: not-allowed;">← Anterior</button>
+            {% endif %}
+            
+            <span style="font-size: 16px; font-weight: bold;">Página {{ pagination.page }} de {{ pagination.pages }}</span>
+            
+            {% if pagination.has_next %}
+            <a href="{{ url_for('ver_listado', page=pagination.next_num) }}" class="btn" style="text-decoration: none;">Siguiente →</a>
+            {% else %}
+            <button class="btn" disabled style="opacity: 0.5; cursor: not-allowed;">Siguiente →</button>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Modal para mostrar detalles del aviso -->
+    <div id="modal-detalle" class="modal hidden">
+        <div class="modal-content">
+            <h3>Detalles del Aviso de Adopción</h3>
+            <div id="contenido-detalle">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+            <div class="fotos-container" id="fotos-detalle">
+                <!-- Las fotos se cargarán dinámicamente -->
+            </div>
+            <button class="btn" onclick="cerrarModal()">Cerrar</button>
+            <button class="btn btn-volver" onclick="window.location.href='{{ url_for('index') }}'">
+                Volver a la portada
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar foto grande -->
+    <div id="modal-foto" class="modal hidden">
+        <div class="modal-content">
+            <img id="foto-grande" class="foto-grande" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Foto grande">
+            <br><br>
+            <button class="btn" onclick="cerrarFoto()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // Función para ver detalles de un aviso
+        function verDetalle(avisoId) {
+            fetch(`/api/aviso/${avisoId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al cargar el aviso');
+                    }
+                    return response.json();
+                })
+                .then(aviso => {
+                    // Construir HTML con los detalles
+                    const contenidoHTML = `
+                        <p><strong>Nombre:</strong> ${aviso.nombre}</p>
+                        <p><strong>Email:</strong> ${aviso.email}</p>
+                        <p><strong>Celular:</strong> ${aviso.celular || 'No proporcionado'}</p>
+                        <p><strong>Tipo:</strong> ${aviso.tipo.charAt(0).toUpperCase() + aviso.tipo.slice(1)}</p>
+                        <p><strong>Cantidad:</strong> ${aviso.cantidad}</p>
+                        <p><strong>Edad:</strong> ${aviso.edad} ${aviso.unidad_medida === 'a' ? 'año' + (aviso.edad > 1 ? 's' : '') : 'mes' + (aviso.edad > 1 ? 'es' : '')}</p>
+                        <p><strong>Región:</strong> ${aviso.region}</p>
+                        <p><strong>Comuna:</strong> ${aviso.comuna}</p>
+                        <p><strong>Sector:</strong> ${aviso.sector || 'No especificado'}</p>
+                        <p><strong>Fecha disponible:</strong> ${new Date(aviso.fecha_entrega).toLocaleString('es-CL')}</p>
+                        <p><strong>Descripción:</strong> ${aviso.descripcion || 'Sin descripción'}</p>
+                    `;
+                    
+                    document.getElementById('contenido-detalle').innerHTML = contenidoHTML;
+                    
+                    // Mostrar fotos
+                    const fotosContainer = document.getElementById('fotos-detalle');
+                    fotosContainer.innerHTML = '';
+                    
+                    if (aviso.fotos && aviso.fotos.length > 0) {
+                        aviso.fotos.forEach(foto => {
+                            const img = document.createElement('img');
+                            img.src = `/static/${foto.ruta}`;
+                            img.alt = 'Foto del aviso';
+                            img.style.maxWidth = '200px';
+                            img.style.margin = '10px';
+                            img.style.cursor = 'pointer';
+                            img.style.borderRadius = '8px';
+                            img.onclick = () => mostrarFotoGrande(`/static/${foto.ruta}`);
+                            fotosContainer.appendChild(img);
+                        });
+                    } else {
+                        fotosContainer.innerHTML = '<p>No hay fotos disponibles</p>';
+                    }
+                    
+                    // Mostrar modal
+                    document.getElementById('modal-detalle').classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al cargar los detalles del aviso: ' + error.message);
+                });
+        }
+
+        // Función para cerrar el modal de detalle
+        function cerrarModal() {
+            document.getElementById('modal-detalle').classList.add('hidden');
+        }
+
+        // Función para mostrar foto grande
+        function mostrarFotoGrande(rutaFoto) {
+            document.getElementById('foto-grande').src = rutaFoto;
+            document.getElementById('modal-foto').classList.remove('hidden');
+        }
+
+        // Función para cerrar foto grande
+        function cerrarFoto() {
+            document.getElementById('modal-foto').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Patitas a la Casa - Inicio</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <div class="navbar">Patitas a la Casa 🐾</div>
+
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" style="padding: 15px; margin: 20px auto; max-width: 800px; border-radius: 5px; background-color: {% if category == 'success' %}#d4edda{% else %}#f8d7da{% endif %}; color: {% if category == 'success' %}#155724{% else %}#721c24{% endif %}; border: 1px solid {% if category == 'success' %}#c3e6cb{% else %}#f5c6cb{% endif %};">
+          {{ message }}
+          <button onclick="this.parentElement.style.display='none'" style="float: right; background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Mensaje de bienvenida -->
+    <div class="welcome-message">
+      <h2>¡Bienvenido!</h2>
+      <p>
+        Encuentra a tu nuevo mejor amigo y ayúdanos a darles un hogar lleno de
+        amor.
+      </p>
+    </div>
+
+    <!-- Imagen de mascotas -->
+    <div class="img-index">
+      <img src="{{ url_for('static', filename='resc/pets.jpg') }}" alt="Mascotas" />
+    </div>
+
+    <!-- Botones para acceder a las demás páginas -->
+    <div class="button-container" style="margin-bottom: 8%">
+      <div class="row">
+        <button class="button" onclick="window.location.href='{{ url_for('agregar_aviso') }}'">
+          Agregar aviso de adopción
+        </button>
+      </div>
+      <div class="row">
+        <button class="button" onclick="window.location.href='{{ url_for('ver_listado') }}'">
+          Ver listado de adopciones
+        </button>
+      </div>
+      <div class="row">
+        <button class="button" onclick="window.location.href='{{ url_for('estadisticas') }}'">
+          Estadísticas
+        </button>
+      </div>
+    </div>
+
+    <div class="header-avisos">
+      <h3>Últimos avisos de adopción</h3>
+    </div>
+
+    <!-- Avisos dinámicos desde la base de datos -->
+    <div class="avisos-container" id="avisos-container">
+      {% if avisos %}
+        {% for aviso in avisos %}
+        <div class="aviso-card">
+          <div class="cantidad-tipo">
+            {{ aviso.cantidad }} {{ aviso.tipo }}{% if aviso.cantidad > 1 %}s{% endif %}
+          </div>
+          <div class="edad">
+            {{ aviso.edad }} {% if aviso.unidad_medida == 'a' %}año{% if aviso.edad > 1 %}s{% endif %}{% else %}mes{% if aviso.edad > 1 %}es{% endif %}{% endif %}
+          </div>
+          {% if aviso.fotos and aviso.fotos|length > 0 %}
+          <div class="foto">
+            <img src="{{ url_for('static', filename=aviso.fotos[0].ruta_archivo) }}" alt="{{ aviso.tipo }}" />
+          </div>
+          {% else %}
+          <div class="foto">
+            <img src="{{ url_for('static', filename='resc/pets.jpg') }}" alt="Sin foto" />
+          </div>
+          {% endif %}
+          <div class="sector">{{ aviso.sector if aviso.sector else 'Sin especificar' }}</div>
+          <div class="comuna">{{ aviso.comuna.nombre }}</div>
+          <div class="fecha">{{ aviso.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="text-align: center; padding: 30px; color: #666; font-size: 18px;">
+          No hay avisos de adopción disponibles en este momento.
+        </p>
+      {% endif %}
+    </div>
+
+    <footer>
+      <p>
+        Tarea 2 - CC5002 Desarrollo de Aplicaciones Web - Jules Paz Fredes
+        Cerain
+      </p>
+    </footer>
+  </body>
+</html>
