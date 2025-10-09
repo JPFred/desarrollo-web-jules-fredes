@@ -136,13 +136,13 @@
                     if (aviso.fotos && aviso.fotos.length > 0) {
                         aviso.fotos.forEach(foto => {
                             const img = document.createElement('img');
-                            img.src = `/static/${foto.ruta}`;
+                            img.src = `/static/${foto.ruta_archivo}`;
                             img.alt = 'Foto del aviso';
                             img.style.maxWidth = '200px';
                             img.style.margin = '10px';
                             img.style.cursor = 'pointer';
                             img.style.borderRadius = '8px';
-                            img.onclick = () => mostrarFotoGrande(`/static/${foto.ruta}`);
+                            img.onclick = () => mostrarFotoGrande(`/static/${foto.ruta_archivo}`);
                             fotosContainer.appendChild(img);
                         });
                     } else {

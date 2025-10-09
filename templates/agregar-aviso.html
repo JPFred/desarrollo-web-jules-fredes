@@ -502,10 +502,13 @@
             if (confirmarSi) {
                 confirmarSi.addEventListener('click', function() {
                     const modalConfirmacion = document.getElementById('modal-confirmacion');
-                    const modalExito = document.getElementById('modal-exito');
-                    
                     if (modalConfirmacion) modalConfirmacion.classList.add('hidden');
-                    if (modalExito) modalExito.classList.remove('hidden');
+                    
+                    // Enviar el formulario al servidor
+                    const form = document.getElementById('formulario-adopcion');
+                    if (form) {
+                        form.submit();
+                    }
                 });
             }
 
@@ -520,7 +523,7 @@
             const volverPortada = document.getElementById('volver-portada');
             if (volverPortada) {
                 volverPortada.addEventListener('click', function() {
-                    window.location.href = 'index.html';
+                    window.location.href = '{{ url_for("index") }}';
                 });
             }
         });

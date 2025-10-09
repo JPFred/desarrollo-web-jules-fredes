@@ -276,7 +276,7 @@ def ver_listado():
     page = request.args.get('page', 1, type=int)
     avisos_paginados = AvisoAdopcion.query.order_by(
         AvisoAdopcion.fecha_ingreso.desc()
-    ).paginate(page=page, per_page=5, error_out=False)
+    ).paginate(page=page, per_page=15, error_out=False)
     
     return render_template('ver-listado.html', 
                          avisos=avisos_paginados.items,
@@ -300,7 +300,7 @@ def get_aviso_detalle(aviso_id):
         'region': aviso.comuna.region.nombre,
         'sector': aviso.sector,
         'fecha_entrega': aviso.fecha_entrega.isoformat(),
-        'fotos': [{'ruta': f.ruta_archivo, 'nombre': f.nombre_archivo} for f in aviso.fotos],
+        'fotos': [{'ruta_archivo': f.ruta_archivo, 'nombre_archivo': f.nombre_archivo} for f in aviso.fotos],
         'contactos': [{'tipo': c.nombre, 'id': c.identificador} for c in aviso.contactos]
     })
 
