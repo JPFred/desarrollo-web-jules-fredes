@@ -1,87 +1,87 @@
-# Tarea 2: Sistema de Gestión de Avisos de Adopción de Mascotas
+# Tarea 3: Sistema de Gestión de Avisos de Adopción de Mascotas
 
 ## 👤 Autor
 
 **Jules Paz Fredes Cerain**  
-CC5002 - Desarrollo de Aplicaciones Web  
+CC5002 - Desarrollo de Aplicaciones Web
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## Decisiones de Implementación
 
-### Backend
-| Tecnología |
-|------------|
-| **Python 3.11+** |
-| **Flask 3.0.0** |
-| **SQLAlchemy** |
-| **MySQL 8.0+** |
-| **PyMySQL** |
+### 1. Sistema de Comentarios
 
-### Frontend
-| Tecnología |
-|------------|
-| **HTML5** |
-| **CSS3** |
-| **JavaScript ES6** |
-| **Jinja2** |
+**Validaciones:**
 
----
+- **Nombre:** 3-80 caracteres (validado en cliente y servidor)
+- **Comentario:** mínimo 5 caracteres (validado en cliente y servidor)
 
-## 📋 Decisiones de Implementación
+**Características:**
 
-### Configuración de Base de Datos
+- Llamadas asíncronas con `fetch()` API (sin recargar página)
+- Comentarios ordenados por fecha descendente (más recientes primero)
+- Formato de fecha: `dd/mm/yyyy HH:MM`
+
+### 2. Estadísticas con Chart.js
+
+**Gráficos implementados:**
+
+1. **Líneas:** Avisos de adopción por día
+2. **Torta:** Distribución por tipo de mascota (Gatos vs Perros)
+3. **Barras:** Avisos por mes y tipo de mascota
+
+**Características:**
+
+- Todas las estadísticas usan llamadas asíncronas a APIs REST
+- Compatibilidad con SQLite y MySQL (agrupación por mes implementada en Python)
+- Colores consistentes: `#d74967` (rosa), `#f47066` (coral), `#a7a6da` (lavanda)
+
+### 3. Base de Datos
+
+**Configuración:**
+
 - Usuario: `cc5002`
 - Contraseña: `programacionweb`
 - Base de datos: `tarea2`
 
-### Formato de Celular
-Implementado como `+NNN.NNNNNNNN` (ejemplo: `+569.12345678`). El campo es opcional.
+**Modelo Comentario:**
 
-### Validación de Fotos
-- Mínimo 1 foto, máximo 5 fotos por aviso
-- Formatos aceptados: png, jpg, jpeg, gif, webp, bmp
-- Tamaño máximo: 5MB por foto
-- Almacenadas en `static/uploads/` con nombres seguros
-
-### Paginación
-15 avisos por página en `/ver-listado` según especificación.
-
-### Validaciones
-Validaciones JavaScript del cliente se replican en el servidor para seguridad:
-- Región/Comuna con verificación de relación
-- Email formato `texto@texto.dominio`
-- Nombre 3-200 caracteres
-- Fecha de entrega futura
-- Fotos: tipo, tamaño y cantidad
-
-### Estadísticas
-El botón aparece deshabilitado con mensaje "Funcionalidad pendiente para la Tarea 3".  
-La ruta `/estadisticas` no está implementada.
-
-### Seguridad
-- SQLAlchemy ORM (prevención SQL Injection)
-- Escape automático Jinja2 (prevención XSS)
-- `secure_filename()` para archivos
-- Validación de tipos MIME
+```python
+id: Integer (PK)
+nombre: String(80)
+texto: Text
+fecha: DateTime
+aviso_id: Integer (FK -> aviso_adopcion.id)
+```
 
 ---
 
-## 🚀 Ejecución
+## 🚀 Configuración y Ejecución
+
+### 1. Configurar Base de Datos
 
 ```bash
-# Configurar base de datos
+# Ejecutar scripts SQL (requiere MySQL instalado)
 mysql -u root -p < db/tarea2.sql
 mysql -u cc5002 -p tarea2 < db/region-comuna.sql
+```
 
-# Crear entorno virtual
+### 2. Instalar Dependencias
+
+```bash
+# Crear entorno virtual (si no existe)
 python -m venv .venv
+
+# Activar entorno virtual
 .\.venv\Scripts\Activate.ps1
 
-# Instalar dependencias
-pip install flask flask-sqlalchemy pymysql python-dotenv werkzeug
+# Instalar paquetes requeridos
+pip install flask flask-sqlalchemy pymysql cryptography
+```
 
-# Ejecutar
+### 3. Ejecutar Aplicación
+
+```bash
 python app.py
 ```
 

@@ -3,21 +3,21 @@
 <head>
     <meta charset="utf-8">
     <title>Estadísticas - Patitas a la Casa</title>
-    <link rel="stylesheet" type="text/css" href="../css/index.css">
-    <link rel="stylesheet" type="text/css" href="../css/estats-sty.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/estats-sty.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Navbar -->
     <div class="navbar">
-        <a href="index.html" class="nav-button">← Volver</a>
+        <a href="{{ url_for('index') }}" class="nav-button">← Volver</a>
         Patitas a la Casa 🐾
     </div>
 
     <div class="estadisticas-container">
         <h2>Estadísticas de Adopciones</h2>
         
-        <button class="btn-volver" onclick="window.location.href='index.html'">
+        <button class="btn-volver" onclick="window.location.href='{{ url_for('index') }}'">
             Volver a la portada
         </button>
         
@@ -54,202 +54,13 @@
         </div>
         
         <div style="text-align: center; margin-top: 30px;">
-            <button class="btn-volver" onclick="window.location.href='index.html'">
+            <button class="btn-volver" onclick="window.location.href='{{ url_for('index') }}'">
                 Volver a la portada
             </button>
         </div>
     </div>
 
-    <script>
-        // Datos inventados para las estadísticas
-        const datosEjemplo = {
-            // Avisos por día (últimos 15 días)
-            avisosPorDia: {
-                fechas: [
-                    '2025-08-22', '2025-08-23', '2025-08-24', '2025-08-25', '2025-08-26',
-                    '2025-08-27', '2025-08-28', '2025-08-29', '2025-08-30', '2025-08-31',
-                    '2025-09-01', '2025-09-02', '2025-09-03', '2025-09-04', '2025-09-05'
-                ],
-                cantidades: [2, 1, 3, 0, 2, 1, 4, 2, 1, 3, 2, 1, 2, 3, 1]
-            },
-            
-            // Avisos por tipo
-            avisosPorTipo: {
-                gatos: 15,
-                perros: 12
-            },
-            
-            // Avisos por mes
-            avisosPorMes: {
-                meses: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto'],
-                gatos: [3, 4, 2, 5, 3, 4, 6, 8],
-                perros: [2, 3, 4, 3, 2, 5, 4, 6]
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            actualizarResumen();
-            crearGraficoLineas();
-            crearGraficoTorta();
-            crearGraficoBarras();
-        });
-
-        function actualizarResumen() {
-            const totalAvisos = datosEjemplo.avisosPorTipo.gatos + datosEjemplo.avisosPorTipo.perros;
-            document.getElementById('total-avisos').textContent = totalAvisos;
-            document.getElementById('total-gatos').textContent = datosEjemplo.avisosPorTipo.gatos;
-            document.getElementById('total-perros').textContent = datosEjemplo.avisosPorTipo.perros;
-        }
-
-        function crearGraficoLineas() {
-            const ctx = document.getElementById('grafico-lineas').getContext('2d');
-            
-            // Formatear fechas para mostrar solo día/mes
-            const fechasFormateadas = datosEjemplo.avisosPorDia.fechas.map(fecha => {
-                const date = new Date(fecha);
-                return `${date.getDate()}/${date.getMonth() + 1}`;
-            });
-            
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: fechasFormateadas,
-                    datasets: [{
-                        label: 'Avisos de adopción',
-                        data: datosEjemplo.avisosPorDia.cantidades,
-                        borderColor: '#F47066',
-                        backgroundColor: 'rgba(244, 112, 102, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#F47066',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            },
-                            title: {
-                                display: true,
-                                text: 'Cantidad de avisos'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Días'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function crearGraficoTorta() {
-            const ctx = document.getElementById('grafico-torta').getContext('2d');
-            
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Gatos', 'Perros'],
-                    datasets: [{
-                        data: [datosEjemplo.avisosPorTipo.gatos, datosEjemplo.avisosPorTipo.perros],
-                        backgroundColor: [
-                            '#F47066',
-                            '#4BC0C0'
-                        ],
-                        borderColor: [
-                            '#ffffff',
-                            '#ffffff'
-                        ],
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function crearGraficoBarras() {
-            const ctx = document.getElementById('grafico-barras').getContext('2d');
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: datosEjemplo.avisosPorMes.meses,
-                    datasets: [
-                        {
-                            label: 'Gatos',
-                            data: datosEjemplo.avisosPorMes.gatos,
-                            backgroundColor: '#F47066',
-                            borderColor: '#F47066',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Perros',
-                            data: datosEjemplo.avisosPorMes.perros,
-                            backgroundColor: '#4BC0C0',
-                            borderColor: '#4BC0C0',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            },
-                            title: {
-                                display: true,
-                                text: 'Cantidad'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Meses'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    </script>
+    <!-- Script para generar los gráficos con datos reales de la BD -->
+    <script src="{{ url_for('static', filename='js/estadisticas.js') }}"></script>
 </body>
 </html>

@@ -48,3 +48,13 @@ class ContactarPor(db.Model):
     nombre = db.Column(db.Enum('whatsapp', 'telegram', 'X', 'instagram', 'tiktok', 'otra'), nullable=False)
     identificador = db.Column(db.String(150), nullable=False)
     actividad_id = db.Column(db.Integer, db.ForeignKey('aviso_adopcion.id'), nullable=False)
+
+class Comentario(db.Model): 
+    __tablename__ = 'comentario'
+    id = db.Column(db.Integer, primary_key=True)
+    aviso_id = db.Column(db.Integer, db.ForeignKey('aviso_adopcion.id'), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False)
+    texto = db.Column(db.Text(500), nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    
+    aviso = db.relationship('AvisoAdopcion', backref='comentarios')

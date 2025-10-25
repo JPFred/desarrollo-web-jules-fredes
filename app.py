@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from werkzeug.utils import secure_filename
-from models import db, Region, Comuna, AvisoAdopcion, Foto, ContactarPor
+from models import db, Region, Comuna, AvisoAdopcion, Foto, ContactarPor, Comentario
 from config import Config
 from utils.validations import *
 import os
@@ -303,6 +303,175 @@ def get_aviso_detalle(aviso_id):
         'fotos': [{'ruta_archivo': f.ruta_archivo, 'nombre_archivo': f.nombre_archivo} for f in aviso.fotos],
         'contactos': [{'tipo': c.nombre, 'id': c.identificador} for c in aviso.contactos]
     })
+
+@app.route('/api/aviso/<int:aviso_id>/comentario', methods=['POST'])
+def agregar_comentario(aviso_id):
+    """API para agregar un comentario a un aviso"""
+    try:
+        data = request.get_json()
+        nombre = data.get('nombre', '').strip()
+        texto = data.get('texto', '').strip()
+        
+        errores = {}
+        
+        if not nombre:
+            errores['nombre'] = 'El nombre es obligatorio'
+        elif len(nombre) < 3:
+            errores['nombre'] = 'El nombre debe tener al menos 3 caracteres'
+        elif len(nombre) > 80:
+            errores['nombre'] = 'El nombre no puede superar 80 caracteres'
+        
+        if not texto:
+            errores['texto'] = 'El comentario es obligatorio'
+        elif len(texto) < 5:
+            errores['texto'] = 'El comentario debe tener al menos 5 caracteres'
+        
+        aviso = AvisoAdopcion.query.get(aviso_id)
+        if not aviso:
+            return jsonify({'success': False, 'error': 'Aviso no encontrado'}), 404
+        
+        if errores:
+            return jsonify({'success': False, 'errores': errores}), 400
+        
+        nuevo_comentario = Comentario(
+            nombre=nombre,
+            texto=texto,
+            fecha=datetime.now(),
+            aviso_id=aviso_id
+        )
+        
+        db.session.add(nuevo_comentario)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'mensaje': 'Comentario agregado exitosamente',
+            'comentario': {
+                'id': nuevo_comentario.id,
+                'nombre': nuevo_comentario.nombre,
+                'texto': nuevo_comentario.texto,
+                'fecha': nuevo_comentario.fecha.strftime('%Y-%m-%d %H:%M:%S')
+            }
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/aviso/<int:aviso_id>/comentarios', methods=['GET'])
+def obtener_comentarios(aviso_id):
+    """API para obtener todos los comentarios de un aviso"""
+    try:
+        aviso = AvisoAdopcion.query.get(aviso_id)
+        if not aviso:
+            return jsonify({'error': 'Aviso no encontrado'}), 404
+        
+        comentarios = Comentario.query.filter_by(aviso_id=aviso_id)\
+                                       .order_by(Comentario.fecha.desc())\
+                                       .all()
+        
+        comentarios_json = []
+        for c in comentarios:
+            comentarios_json.append({
+                'id': c.id,
+                'nombre': c.nombre,
+                'texto': c.texto,
+                'fecha': c.fecha.strftime('%d/%m/%Y %H:%M')
+            })
+        
+        return jsonify(comentarios_json), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/aviso/<int:aviso_id>')
+def ver_aviso(aviso_id):
+    """Muestra el detalle completo de un aviso con comentarios"""
+    aviso = AvisoAdopcion.query.get_or_404(aviso_id)
+    comuna = Comuna.query.get(aviso.comuna_id)
+    region = Region.query.get(comuna.region_id) if comuna else None
+    
+    return render_template('ver-aviso.html', 
+                          aviso=aviso, 
+                          comuna=comuna, 
+                          region=region)
+
+@app.route('/estadisticas')
+def estadisticas():
+    """Muestra la página de estadísticas con gráficos"""
+    return render_template('estats.html')
+
+@app.route('/api/estadisticas/avisos-por-dia')
+def get_avisos_por_dia():
+    """API que retorna cantidad de avisos agrupados por día"""
+    from sqlalchemy import func
+    
+    try:
+        resultados = db.session.query(
+            func.date(AvisoAdopcion.fecha_ingreso).label('fecha'),
+            func.count(AvisoAdopcion.id).label('cantidad')
+        ).group_by(
+            func.date(AvisoAdopcion.fecha_ingreso)
+        ).order_by('fecha').all()
+        
+        datos = []
+        for fecha, cantidad in resultados:
+            datos.append({
+                'fecha': fecha.strftime('%Y-%m-%d'),
+                'cantidad': cantidad
+            })
+        
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/estadisticas/avisos-por-tipo')
+def get_avisos_por_tipo():
+    """API que retorna cantidad de avisos por tipo de mascota (gato/perro)"""
+    from sqlalchemy import func
+    
+    try:
+        resultados = db.session.query(
+            AvisoAdopcion.tipo,
+            func.count(AvisoAdopcion.id).label('cantidad')
+        ).group_by(AvisoAdopcion.tipo).all()
+        
+        datos = []
+        for tipo, cantidad in resultados:
+            datos.append({
+                'tipo': tipo,
+                'cantidad': cantidad
+            })
+        
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/estadisticas/avisos-por-mes-tipo')
+def get_avisos_por_mes_tipo():
+    """API que retorna avisos agrupados por mes y tipo de mascota"""
+    from sqlalchemy import func
+    
+    try:
+        avisos = AvisoAdopcion.query.all()
+        datos_por_mes = {}
+        
+        for aviso in avisos:
+            mes = aviso.fecha_ingreso.strftime('%Y-%m')
+            
+            if mes not in datos_por_mes:
+                datos_por_mes[mes] = {'mes': mes, 'perros': 0, 'gatos': 0}
+            
+            if aviso.tipo == 'perro':
+                datos_por_mes[mes]['perros'] += 1
+            else:
+                datos_por_mes[mes]['gatos'] += 1
+        
+        datos = sorted(datos_por_mes.values(), key=lambda x: x['mes'])
+        
+        return jsonify(datos)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

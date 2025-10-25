@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ aviso.nombre }} - Detalle del Aviso</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ver-list-sty.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/comentarios.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="{{ url_for('index') }}" class="nav-button">← Volver</a>
+        Patitas a la Casa 🐾
+    </div>
+
+    <div class="container" style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+        
+        <div class="detalle-aviso">
+            <h1>{{ aviso.nombre }}</h1>
+            
+            <div class="info-principal" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <p><strong>Tipo de mascota:</strong> 
+                            {{ aviso.tipo|capitalize }}
+                            {% if aviso.tipo == 'gato' %}🐱{% else %}🐶{% endif %}
+                        </p>
+                        <p><strong>Cantidad:</strong> {{ aviso.cantidad }}</p>
+                        <p><strong>Edad:</strong> 
+                            {{ aviso.edad }} 
+                            {% if aviso.unidad_medida == 'a' %}
+                                año{% if aviso.edad > 1 %}s{% endif %}
+                            {% else %}
+                                mes{% if aviso.edad > 1 %}es{% endif %}
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <p><strong>Región:</strong> {{ region.nombre if region else 'N/A' }}</p>
+                        <p><strong>Comuna:</strong> {{ comuna.nombre if comuna else 'N/A' }}</p>
+                        <p><strong>Sector:</strong> {{ aviso.sector if aviso.sector else 'No especificado' }}</p>
+                    </div>
+                </div>
+                
+                <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+                
+                <p><strong>Descripción:</strong></p>
+                <p style="margin-top: 10px;">{{ aviso.descripcion if aviso.descripcion else 'Sin descripción' }}</p>
+                
+                <p style="margin-top: 15px;"><strong>Fecha disponible para entrega:</strong> 
+                    {{ aviso.fecha_entrega.strftime('%d/%m/%Y') }}
+                </p>
+            </div>
+            
+            {% if aviso.fotos %}
+            <div class="fotos-aviso" style="margin-bottom: 30px;">
+                <h3>Fotos</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                    {% for foto in aviso.fotos %}
+                    <img src="{{ url_for('static', filename='uploads/' + foto.nombre_archivo) }}" 
+                         alt="Foto de {{ aviso.nombre }}"
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; cursor: pointer;"
+                         onclick="window.open(this.src, '_blank')">
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="contacto-info" style="background: #e8f4f8; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                <h3>Información de Contacto</h3>
+                <p><strong>Nombre:</strong> {{ aviso.nombre }}</p>
+                <p><strong>Email:</strong> <a href="mailto:{{ aviso.email }}">{{ aviso.email }}</a></p>
+                {% if aviso.celular %}
+                <p><strong>Celular:</strong> {{ aviso.celular }}</p>
+                {% endif %}
+                
+                {% if aviso.contactos %}
+                <p><strong>Contactar también por:</strong></p>
+                <ul style="margin-left: 20px;">
+                    {% for contacto in aviso.contactos %}
+                    <li>{{ contacto.nombre }}: {{ contacto.identificador }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #d74967;">
+        
+        <div id="seccion-comentarios">
+            <h2 style="color: #d74967; margin-bottom: 20px;">💬 Comentarios</h2>
+            
+            <div class="formulario-comentario" style="background: #f9f9f9; padding: 25px; border-radius: 8px; margin-bottom: 30px;">
+                <h3 style="margin-top: 0;">Agregar un comentario</h3>
+                
+                <form id="form-comentario">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="nombre-comentario" style="display: block; margin-bottom: 8px; font-weight: bold;">
+                            Nombre: <span style="color: red;">*</span>
+                        </label>
+                        <input type="text" 
+                               id="nombre-comentario" 
+                               name="nombre" 
+                               placeholder="Tu nombre (mínimo 3, máximo 80 caracteres)"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+                               required>
+                        <span id="error-nombre" class="error" style="color: #d74967; font-size: 0.9em; display: none; margin-top: 5px;"></span>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="texto-comentario" style="display: block; margin-bottom: 8px; font-weight: bold;">
+                            Comentario: <span style="color: red;">*</span>
+                        </label>
+                        <textarea id="texto-comentario" 
+                                  name="texto" 
+                                  rows="4" 
+                                  cols="50"
+                                  placeholder="Escribe tu comentario (mínimo 5 caracteres)"
+                                  style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical; font-family: Arial, sans-serif;"
+                                  required></textarea>
+                        <span id="error-texto" class="error" style="color: #d74967; font-size: 0.9em; display: none; margin-top: 5px;"></span>
+                    </div>
+                    
+                    <button type="submit" 
+                            id="btn-enviar"
+                            style="background-color: #d74967; color: white; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                        Agregar comentario
+                    </button>
+                </form>
+                
+                <div id="mensaje-comentario" style="margin-top: 15px;"></div>
+            </div>
+            
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+            
+            <div class="lista-comentarios">
+                <h3>Comentarios de este aviso</h3>
+                <div id="comentarios-contenedor" style="margin-top: 20px;">
+                    <p style="color: #666; text-align: center; padding: 20px;">Cargando comentarios...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; text-align: center;">
+            <a href="{{ url_for('index') }}" 
+               style="display: inline-block; padding: 12px 30px; background-color: #a7a6da; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                ← Volver a la portada
+            </a>
+            <a href="{{ url_for('ver_listado') }}" 
+               style="display: inline-block; padding: 12px 30px; background-color: #f47066; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; margin-left: 10px;">
+                Ver todos los avisos
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        const AVISO_ID = {{ aviso.id }};
+    </script>
+    
+    <script src="{{ url_for('static', filename='js/comentarios.js') }}"></script>
+</body>
+</html>
