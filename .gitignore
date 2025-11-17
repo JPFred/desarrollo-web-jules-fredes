@@ -30,3 +30,16 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Maven / Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+mvnw
+mvnw.cmd
+
+# Spring Boot
+spring-boot-*.log
