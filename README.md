@@ -1,99 +1,177 @@
-# Tarea 3: Sistema de Gestión de Avisos de Adopción de Mascotas
+# Desarrollo de Aplicaciones Web - CC5002
 
-## 👤 Autor
-
+## Autor
 **Jules Paz Fredes Cerain**  
-CC5002 - Desarrollo de Aplicaciones Web
+CC5002 - Desarrollo de Aplicaciones Web  
+Universidad de Chile
+
+## Descripción
+Repositorio de proyectos y tareas del curso CC5002 - Desarrollo de Aplicaciones Web.
 
 ---
 
-## Decisiones de Implementación
+## 📁 Proyectos en este Repositorio
 
-### 1. Sistema de Comentarios
+### Tarea 4: Sistema de Evaluación de Avisos de Adopción (Spring Boot)
+**Ubicación:** `/avisos-adopcion-springboot/`
 
-**Validaciones:**
+Aplicación web desarrollada con Spring Boot que permite gestionar avisos de adopción de mascotas con sistema de evaluación mediante notas.
 
-- **Nombre:** 3-80 caracteres (validado en cliente y servidor)
-- **Comentario:** mínimo 5 caracteres (validado en cliente y servidor)
+## Tecnologías Utilizadas
+- **Backend:** Spring Boot 3.2.0, Java 17
+- **Base de datos:** MySQL 8.0
+- **ORM:** Spring Data JPA / Hibernate
+- **Frontend:** Thymeleaf, HTML5, CSS3, JavaScript (Fetch API)
+- **Build Tool:** Maven 3.9.11
 
-**Características:**
+## Requisitos
 
-- Llamadas asíncronas con `fetch()` API (sin recargar página)
-- Comentarios ordenados por fecha descendente (más recientes primero)
-- Formato de fecha: `dd/mm/yyyy HH:MM`
+- Java JDK 17 o superior
+- Maven 3.6+
+- MySQL 8.0
+- Base de datos `tarea2` configurada
 
-### 2. Estadísticas con Chart.js
+## Configuración de Base de Datos
 
-**Gráficos implementados:**
+```sql
+Usuario: cc5002
+Contraseña: programacionweb
+Base de datos: tarea2
+```
 
-1. **Líneas:** Avisos de adopción por día
-2. **Torta:** Distribución por tipo de mascota (Gatos vs Perros)
-3. **Barras:** Avisos por mes y tipo de mascota
+## Instalación y Ejecución
 
-**Características:**
+### 1. Clonar o descargar el proyecto
 
-- Todas las estadísticas usan llamadas asíncronas a APIs REST
-- Compatibilidad con SQLite y MySQL (agrupación por mes implementada en Python)
-- Colores consistentes: `#d74967` (rosa), `#f47066` (coral), `#a7a6da` (lavanda)
+### 2. Navegar al directorio del proyecto Spring Boot
 
-### 3. Base de Datos
+```bash
+cd avisos-adopcion-springboot
+```
 
-**Configuración:**
+### 3. Configurar la base de datos
 
-- Usuario: `cc5002`
-- Contraseña: `programacionweb`
-- Base de datos: `tarea2`
+Asegurar que MySQL esté corriendo y la base de datos `tarea2` exista con la tabla `nota` creada.
 
-**Modelo Comentario:**
+### 4. Compilar el proyecto
 
-```python
-id: Integer (PK)
-nombre: String(80)
-texto: Text
-fecha: DateTime
-aviso_id: Integer (FK -> aviso_adopcion.id)
+```bash
+mvn clean install
+```
+
+### 5. Ejecutar la aplicación
+
+```bash
+mvn spring-boot:run
+```
+
+### 6. Acceder a la aplicación
+
+Abre tu navegador en: `http://localhost:8080`
+
+---
+
+## 📂 Estructura del Repositorio
+
+```
+desarrollo-web-jules-fredes/
+├── avisos-adopcion-springboot/    # Tarea 4 - Proyecto Spring Boot
+│   ├── src/
+│   ├── pom.xml
+│   └── README.md
+├── db/                             # Scripts SQL
+│   ├── region-comuna.sql
+│   ├── tabla-comentario.sql
+│   ├── tabla-nota.sql
+│   └── tarea2.sql
+├── static/                         # Recursos estáticos (proyectos anteriores)
+│   ├── css/
+│   ├── js/
+│   └── resc/
+├── templates/                      # Templates HTML (proyectos anteriores)
+├── utils/                          # Utilidades Python
+├── app.py                          # Aplicación Flask (proyectos anteriores)
+├── config.py
+├── models.py
+└── README.md                       # Este archivo
 ```
 
 ---
 
-## 🚀 Configuración y Ejecución
+## Funcionalidades Implementadas (Tarea 4)
 
-### 1. Configurar Base de Datos
+### ✅ [2 puntos] Listado de Avisos
+- Muestra tabla con columnas: ID, Fecha publicación, Sector, Cantidad Tipo Edad, Comuna, Nota
+- La columna "nota" presenta el promedio de evaluaciones
+- Muestra "-" si el aviso no tiene notas
 
-```bash
-# Ejecutar scripts SQL (requiere MySQL instalado)
-mysql -u root -p < db/tarea2.sql
-mysql -u cc5002 -p tarea2 < db/region-comuna.sql
+### ✅ [3 puntos] Evaluación de Avisos
+- Al hacer clic en "evaluar", solicita una nota entre 1 y 7
+- Valida que sea número entero entre 1 y 7 (inclusivo)
+- Guarda la nota en la base de datos
+- Validación del lado del cliente y del servidor
+
+### ✅ [1 punto] Actualización Asíncrona
+- Llamada asíncrona con JavaScript (Fetch API)
+- Recalcula y actualiza el promedio sin recargar la página
+- Animación visual al actualizar el promedio
+
+## Estructura del Proyecto
+```
+src/
+├── main/
+│   ├── java/com/uchile/cc5002/avisos/
+│   │   ├── AvisosAdopcionApplication.java
+│   │   ├── controller/
+│   │   │   ├── AvisoController.java
+│   │   │   └── NotaRestController.java
+│   │   ├── entity/
+│   │   │   ├── AvisoAdopcion.java
+│   │   │   ├── Comuna.java
+│   │   │   ├── Nota.java
+│   │   │   └── Region.java
+│   │   ├── repository/
+│   │   │   ├── AvisoAdopcionRepository.java
+│   │   │   └── NotaRepository.java
+│   │   ├── service/
+│   │   │   └── NotaService.java
+│   │   └── dto/
+│   │       └── AvisoDTO.java
+│   └── resources/
+│       ├── application.properties
+│       ├── templates/
+│       │   └── listado-avisos.html
+│       └── static/
+│           ├── css/
+│           │   └── estilos.css
+│           └── js/
+│               └── evaluacion.js
+└── test/
 ```
 
-### 2. Instalar Dependencias
+## Endpoints
 
-```bash
-# Crear entorno virtual (si no existe)
-python -m venv .venv
+### Vista Web
+- `GET /` - Listado de avisos de adopción
 
-# Activar entorno virtual
-.\.venv\Scripts\Activate.ps1
+### API REST
+- `POST /api/avisos/{avisoId}/notas` - Agregar una nota a un aviso
+  - Body: `{ "nota": <1-7> }`
+  - Response: `{ "success": true, "promedio": <número>, "promedioFormateado": "<texto>" }`
 
-# Instalar paquetes requeridos
-pip install flask flask-sqlalchemy pymysql cryptography
-```
+## Validaciones Implementadas
+- **Cliente (JavaScript):**
+  - Validación de que la nota sea un número
+  - Validación del rango 1-7
+  - Validación de que sea entero
 
-### 3. Ejecutar Aplicación
+- **Servidor (Java):**
+  - Validación del rango 1-7
+  - Manejo de errores
+  - Respuestas JSON estructuradas
 
-```bash
-python app.py
-```
-
-Acceso: [http://127.0.0.1:5000](http://127.0.0.1:5000)
-
----
-
-## 🎨 Diseño Visual
-
-### Paleta de Colores
-
-- **Principal**: `#d74967` (Rosa vibrante)
-- **Secundario**: `#f47066` (Coral)
-- **Acento**: `#a7a6da` (Lavanda)
-- **Fondo**: `#e2e4f4` (Azul claro)
+## Notas de Implementación
+- Se utilizó Lombok para reducir código boilerplate
+- JPA mapea automáticamente las entidades a las tablas existentes
+- El promedio se calcula en tiempo real con cada evaluación
+- Las llamadas asíncronas usan Fetch API (JavaScript moderno)
