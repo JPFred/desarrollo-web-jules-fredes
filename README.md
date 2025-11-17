@@ -1,4 +1,4 @@
-# Desarrollo de Aplicaciones Web - CC5002
+# Tarea 4: Sistema de Evaluación de Avisos de Adopción (Spring Boot)
 
 ## Autor
 **Jules Paz Fredes Cerain**  
@@ -6,16 +6,13 @@ CC5002 - Desarrollo de Aplicaciones Web
 Universidad de Chile
 
 ## Descripción
-Repositorio de proyectos y tareas del curso CC5002 - Desarrollo de Aplicaciones Web.
+Aplicación web desarrollada con Spring Boot que permite gestionar avisos de adopción de mascotas con sistema de evaluación mediante notas.
 
----
-
-## 📁 Proyectos en este Repositorio
-
-### Tarea 4: Sistema de Evaluación de Avisos de Adopción (Spring Boot)
 **Ubicación:** `/avisos-adopcion-springboot/`
 
-Aplicación web desarrollada con Spring Boot que permite gestionar avisos de adopción de mascotas con sistema de evaluación mediante notas.
+Se entrega el repositorio de proyectos y tareas del curso CC5002 - Desarrollo de Aplicaciones Web completo.
+
+---
 
 ## Tecnologías Utilizadas
 - **Backend:** Spring Boot 3.2.0, Java 17
@@ -67,7 +64,7 @@ mvn spring-boot:run
 
 ### 6. Acceder a la aplicación
 
-Abre tu navegador en: `http://localhost:8080`
+Abrir su navegador en: `http://localhost:8080`
 
 ---
 
@@ -77,8 +74,7 @@ Abre tu navegador en: `http://localhost:8080`
 desarrollo-web-jules-fredes/
 ├── avisos-adopcion-springboot/    # Tarea 4 - Proyecto Spring Boot
 │   ├── src/
-│   ├── pom.xml
-│   └── README.md
+│   └── pom.xml
 ├── db/                             # Scripts SQL
 │   ├── region-comuna.sql
 │   ├── tabla-comentario.sql
@@ -175,3 +171,4 @@ src/
 - JPA mapea automáticamente las entidades a las tablas existentes
 - El promedio se calcula en tiempo real con cada evaluación
 - Las llamadas asíncronas usan Fetch API (JavaScript moderno)
+- No se mantiene consistencia con el estilo css de las tareas anteriores debido a problemas de tiempo
