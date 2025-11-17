@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Avisos de Adopción</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Listado de Avisos de Adopción</h1>
+        
+        <table id="tabla-avisos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha publicación</th>
+                    <th>Sector</th>
+                    <th>Cantidad Tipo Edad</th>
+                    <th>Comuna</th>
+                    <th>Nota</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="aviso : ${avisos}">
+                    <td th:text="${aviso.id}">1</td>
+                    <td th:text="${aviso.fechaPublicacion}">2025-06-02</td>
+                    <td th:text="${aviso.sector}">Centro</td>
+                    <td th:text="${aviso.cantidadTipoEdad}">2 gatos 3 meses</td>
+                    <td th:text="${aviso.comuna}">Santiago</td>
+                    <td class="promedio-cell" th:attr="data-aviso-id=${aviso.id}">
+                        <span class="promedio-value" th:text="${aviso.promedioFormatted}">-</span>
+                    </td>
+                    <td>
+                        <a href="#" class="evaluar-btn" 
+                           th:attr="data-aviso-id=${aviso.id}"
+                           onclick="evaluarAviso(event)">evaluar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <script th:src="@{/js/evaluacion.js}"></script>
+</body>
+</html>
